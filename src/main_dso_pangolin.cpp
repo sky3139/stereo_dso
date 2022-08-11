@@ -51,19 +51,17 @@
 #include "IOWrapper/Pangolin/PangolinDSOViewer.h"
 #include "IOWrapper/OutputWrapper/SampleOutputWrapper.h"
 
-#include <opencv/cv.hpp>
-#include <opencv/highgui.h>
-
+#include <opencv2/opencv.hpp>
+using namespace std;
 
 std::string vignette = "";
 std::string gammaCalib = "";
 std::string source = "";
 std::string calib = "";
 double rescale = 1;
-bool reverse = false;
 bool disableROS = false;
 int start=0;
-int end=100000;
+int end_num=100000;
 bool prefetch = false;
 float playbackSpeed=0;	// 0 for linearize (play as fast as possible, while sequentializing tracking & mapping). otherwise, factor on timestamps.
 bool preload=false;
@@ -217,15 +215,7 @@ void parseArgument(char* arg)
 		}
 		return;
 	}
-	if(1==sscanf(arg,"reverse=%d",&option))
-	{
-		if(option==1)
-		{
-			reverse = true;
-			printf("REVERSE!\n");
-		}
-		return;
-	}
+
 	if(1==sscanf(arg,"nogui=%d",&option))
 	{
 		if(option==1)
@@ -261,7 +251,7 @@ void parseArgument(char* arg)
 	}
 	if(1==sscanf(arg,"end=%d",&option))
 	{
-		end = option;
+		end_num = option;
 		printf("END AT %d!\n",start);
 		return;
 	}
@@ -372,7 +362,7 @@ int main( int argc, char** argv )
 	}
 	
 	int lstart=start;
-	int lend = end;
+	int lend = end_num;
 	
 	// build system
 	FullSystem* fullSystem = new FullSystem();
@@ -456,6 +446,7 @@ int main( int argc, char** argv )
 
         for(int ii=0; ii<(int)idsToPlay.size(); ii++)
         {
+			cout<<ii<<endl;
             if(!fullSystem->initialized)	// if not initialized: reset start time.
             {
                 gettimeofday(&tv_start, NULL);
